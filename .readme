@@ -1,0 +1,107 @@
+
+# AI Voice Banking Backend
+
+## Core Responsibilities
+- Receive and validate structured JSON payloads from the AI layer.
+- Authenticate users securely.
+- Process banking intents (balance check, money transfer, transaction history).
+- Update and fetch records from the database.
+- Return structured, machine-readable responses.
+
+---
+
+## Data Flow
+
+1. **Voice/NLP Layer** extracts user intent and constructs a payload.
+2. **Backend API** receives and authenticates the payload.
+3. **Intent Router** maps the intent to the appropriate service function.
+4. **Database Layer** performs CRUD operations.
+5. The backend returns a response for the AI to narrate to the user.
+
+---
+
+## Example Payload
+
+```json
+{
+  "user_id": "sam",
+  "intent": "transfer_money",
+  "language": "en",
+  "details": {
+    "receiver_account": "9876543210",
+    "amount": 5000
+  }
+}
+````
+
+---
+
+## Example Response
+
+```json
+{
+  "status": "success",
+  "message": "₹5000 has been successfully transferred to account 9876543210.",
+  "remaining_balance": 12500
+}
+```
+
+---
+
+
+
+## Example Function: `transfer_money()`
+
+```python
+def transfer_money(sender_id, receiver_account, amount):
+    sender = get_user_by_id(sender_id)
+    receiver = get_user_by_account(receiver_account)
+
+    if not sender or not receiver:
+        return {"status": "error", "message": "Invalid account details."}
+
+    if sender['balance'] < amount:
+        return {"status": "error", "message": "Insufficient funds."}
+
+    update_balance(sender_id, sender['balance'] - amount)
+    update_balance(receiver['id'], receiver['balance'] + amount)
+    record_transaction(sender_id, receiver['id'], amount)
+
+    return {
+        "status": "success",
+        "message": f"₹{amount} successfully transferred to account {receiver_account}.",
+        "remaining_balance": sender['balance'] - amount
+    }
+```
+
+---
+
+## Error Handling
+
+* Every function should return a consistent JSON response with:
+
+  * `status`: `"success"` or `"error"`
+  * `message`: descriptive text
+  * Optional fields such as `remaining_balance` or `transaction_id`
+
+* Global exception handlers must log and respond with safe, readable messages.
+
+---
+
+
+**Expected Request Body:**
+- JSON payload (as shown in the Example Payload section)
+
+**Expected Response:**
+- Structured JSON (as shown in the Example Response section)
+
+> The AI layer must send payloads to this endpoint dynamically — no hardcoded data should exist on the AI side except the user’s spoken intent.
+**Configuration Setup**
+
+Duplicate config_example.py and rename it to config.py.
+
+Add your actual OPENAI_API_KEY and update BACKEND_URL if applicable.
+
+Keep config.py private — it’s excluded by .gitignore.
+
+Run python app_og.py to start the assistant.
