@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ------------------------------
 # Virtual Environment
 # ------------------------------
@@ -67,3 +68,7 @@ mock_data/
 test_results/
 local_tests/
 *.json.backup
+=======
+# Google App Engine generated folder
+appengine-generated/
+>>>>>>> eb90db0283e11b39ca183c3180b43b139d2f3b1d
